@@ -1,0 +1,1 @@
+# elk-aws-autoscalling-cluster
