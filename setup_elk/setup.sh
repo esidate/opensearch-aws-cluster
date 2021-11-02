@@ -5,6 +5,9 @@ print_err() {
     printf "${RC} * ERROR${EC}: $@\n" 1>&2
 }
 
+sudo swapoff -a
+sudo sed -i '/ swap / s/^/#/' /etc/fstab
+
 sudo apt update >>$LOGFILE 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
