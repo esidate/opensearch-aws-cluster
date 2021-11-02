@@ -6,7 +6,7 @@ print_err() {
 
 LOGFILE="/var/log/elk-setup.log"
 sudo touch $LOGFILE
-chown $USER:$USER $LOGFILE
+sudo chown $USER:$USER $LOGFILE
 
 sudo swapoff -a
 sudo sed -i '/ swap / s/^/#/' /etc/fstab
