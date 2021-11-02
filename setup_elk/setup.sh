@@ -1,9 +1,11 @@
 #!/bin/sh
 
-LOGFILE="/var/log/elk-setup.log"
 print_err() {
     printf "${RC} * ERROR${EC}: $@\n" 1>&2
 }
+
+LOGFILE="/var/log/elk-setup.log"
+sudo mkdir $LOGFILE
 
 sudo swapoff -a
 sudo sed -i '/ swap / s/^/#/' /etc/fstab
