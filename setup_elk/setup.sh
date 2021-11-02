@@ -15,14 +15,14 @@ sudo swapoff -a
 sudo sed -i '/ swap / s/^/#/' /etc/fstab
 
 print_info "Update repository"
-sudo apt update >>$LOGFILE 2>&1
+sudo apt-get update >>$LOGFILE 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
     print_err "Could not install updates (Error Code: $ERROR)."
     exit
 fi
 print_info "Install default-jre"
-sudo apt install -y default-jre >>$LOGFILE 2>&1
+sudo apt-get install -y default-jre >>$LOGFILE 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
     print_err "Could not default-jre (Error Code: $ERROR)."
@@ -31,7 +31,7 @@ fi
 java -version >>$LOGFILE 2>&1
 
 print_info "Install default-jdk"
-sudo apt install -y default-jdk >>$LOGFILE 2>&1
+sudo apt-get install -y default-jdk >>$LOGFILE 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
     print_err "Could not default-jdk (Error Code: $ERROR)."
@@ -40,7 +40,7 @@ fi
 javac -version >>$LOGFILE 2>&1
 
 print_info "Install nginx"
-sudo apt install -y nginx >>$LOGFILE 2>&1
+sudo apt-get install -y nginx >>$LOGFILE 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
     print_err "Could not nginx (Error Code: $ERROR)."
@@ -52,13 +52,12 @@ sudo ufw allow 'Nginx Full' >>$LOGFILE 2>&1
 sudo ufw allow ssh >>$LOGFILE 2>&1
 sudo ufw --force enable >>$LOGFILE 2>&1
 sudo ufw status >>$LOGFILE 2>&1
-systemctl status nginx >>$LOGFILE 2>&1
 curl -4 icanhazip.com >>$LOGFILE 2>&1
 
 curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
 echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-7.x.list
 print_info "Update repository"
-sudo apt update >>$LOGFILE 2>&1
+sudo apt-get update >>$LOGFILE 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
     print_err "Could not install updates (Error Code: $ERROR)."
@@ -66,7 +65,7 @@ if [ $ERROR -ne 0 ]; then
 fi
 
 print_info "Install elasticsearch"
-sudo apt install -y elasticsearch >>$LOGFILE 2>&1
+sudo apt-get install -y elasticsearch >>$LOGFILE 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
     print_err "Could not install elasticsearch (Error Code: $ERROR)."
@@ -82,7 +81,8 @@ if [ $ERROR -ne 0 ]; then
 fi
 
 print_info "Enable elasticsearch"
-sudo systemctl enable elasticsearch >>$LOGFILE 2>&1
+sudo systemctl daemon-reload
+sudo systemctl enable elasticsearch.service >>$LOGFILE 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
     print_err "Could not enable elasticsearch in systemctl (Error Code: $ERROR)."
@@ -90,7 +90,7 @@ if [ $ERROR -ne 0 ]; then
 fi
 
 print_info "Start elasticsearch"
-sudo systemctl start elasticsearch >>$LOGFILE 2>&1
+sudo systemctl start elasticsearch.service >>$LOGFILE 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
     print_err "Could not start elasticsearch (Error Code: $ERROR)."
@@ -98,7 +98,7 @@ if [ $ERROR -ne 0 ]; then
 fi
 
 print_info "Install kibana"
-sudo apt install -y kibana >>$LOGFILE 2>&1
+sudo apt-get install -y kibana >>$LOGFILE 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
     print_err "Could not install kibana (Error Code: $ERROR)."
@@ -114,7 +114,7 @@ if [ $ERROR -ne 0 ]; then
 fi
 
 print_info "Start kibana"
-sudo systemctl start kibana >>$LOGFILE 2>&1
+sudo systemctl start kibana.service >>$LOGFILE 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
     print_err "Could not start kibana (Error Code: $ERROR)."
@@ -139,7 +139,7 @@ if [ $ERROR -ne 0 ]; then
 fi
 
 print_info "Install logstash"
-sudo apt install -y logstash >>$LOGFILE 2>&1
+sudo apt-get install -y logstash >>$LOGFILE 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
     print_err "Could not install logstash (Error Code: $ERROR)."
@@ -168,4 +168,9 @@ print_info "Enable logstash"
 sudo systemctl enable logstash
 
 print_info "Start logstash"
-sudo systemctl start logstash
+sudo systemctl start logstash.service
+
+systemctl --no-pager status nginx.service >>$LOGFILE 2>&1
+systemctl --no-pager status elasticsearch.service >>$LOGFILE 2>&1
+systemctl --no-pager status kibana.service >>$LOGFILE 2>&1
+systemctl --no-pager status logstash.service >>$LOGFILE 2>&1
