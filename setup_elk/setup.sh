@@ -1,7 +1,10 @@
 #!/bin/sh
 
 print_err() {
-    printf "${RC} * ERROR${EC}: $@\n" 1>&2
+    printf "* ERROR: $@\n" 1>&2
+}
+print_info() {
+    printf "* INFO: $@\n" 1>&2
 }
 
 LOGFILE="/var/log/elk-setup.log"
@@ -11,13 +14,14 @@ sudo chown $USER:$USER $LOGFILE
 sudo swapoff -a
 sudo sed -i '/ swap / s/^/#/' /etc/fstab
 
+print_info "Update repository"
 sudo apt update >>$LOGFILE 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
     print_err "Could not install updates (Error Code: $ERROR)."
     exit
 fi
-
+print_info "Install default-jre"
 sudo apt install -y default-jre >>$LOGFILE 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
@@ -26,6 +30,7 @@ if [ $ERROR -ne 0 ]; then
 fi
 java -version >>$LOGFILE 2>&1
 
+print_info "Install default-jdk"
 sudo apt install -y default-jdk >>$LOGFILE 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
@@ -34,6 +39,7 @@ if [ $ERROR -ne 0 ]; then
 fi
 javac -version >>$LOGFILE 2>&1
 
+print_info "Install nginx"
 sudo apt install -y nginx >>$LOGFILE 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
@@ -42,8 +48,8 @@ if [ $ERROR -ne 0 ]; then
 fi
 
 sudo ufw app list >>$LOGFILE 2>&1
-sudo ufw allow 'Nginx Full'
-sudo ufw allow ssh
+sudo ufw allow 'Nginx Full' >>$LOGFILE 2>&1
+sudo ufw allow ssh >>$LOGFILE 2>&1
 sudo ufw --force enable >>$LOGFILE 2>&1
 sudo ufw status >>$LOGFILE 2>&1
 systemctl status nginx >>$LOGFILE 2>&1
@@ -51,6 +57,7 @@ curl -4 icanhazip.com >>$LOGFILE 2>&1
 
 curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
 echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-7.x.list
+print_info "Update repository"
 sudo apt update >>$LOGFILE 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
@@ -58,6 +65,7 @@ if [ $ERROR -ne 0 ]; then
     exit
 fi
 
+print_info "Install elasticsearch"
 sudo apt install -y elasticsearch >>$LOGFILE 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
@@ -65,6 +73,7 @@ if [ $ERROR -ne 0 ]; then
     exit
 fi
 
+print_info "Configure elasticsearch.yml"
 sudo cp -f elasticsearch.yml /etc/elasticsearch/elasticsearch.yml >>$LOGFILE 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
@@ -72,6 +81,7 @@ if [ $ERROR -ne 0 ]; then
     exit
 fi
 
+print_info "Enable elasticsearch"
 sudo systemctl enable elasticsearch >>$LOGFILE 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
@@ -79,6 +89,7 @@ if [ $ERROR -ne 0 ]; then
     exit
 fi
 
+print_info "Start elasticsearch"
 sudo systemctl start elasticsearch >>$LOGFILE 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
@@ -86,6 +97,7 @@ if [ $ERROR -ne 0 ]; then
     exit
 fi
 
+print_info "Install kibana"
 sudo apt install -y kibana >>$LOGFILE 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
@@ -93,6 +105,7 @@ if [ $ERROR -ne 0 ]; then
     exit
 fi
 
+print_info "Enable kibana"
 sudo systemctl enable kibana >>$LOGFILE 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
@@ -100,6 +113,7 @@ if [ $ERROR -ne 0 ]; then
     exit
 fi
 
+print_info "Start kibana"
 sudo systemctl start kibana >>$LOGFILE 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
@@ -107,6 +121,7 @@ if [ $ERROR -ne 0 ]; then
     exit
 fi
 
+print_info "Configure nginx"
 sudo cp -f rev-proxy.conf /etc/nginx/sites-available/default >>$LOGFILE 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
@@ -115,6 +130,7 @@ if [ $ERROR -ne 0 ]; then
 fi
 
 sudo nginx -t >>$LOGFILE 2>&1
+print_info "Reload nginx"
 sudo systemctl reload nginx >>$LOGFILE 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
@@ -122,12 +138,15 @@ if [ $ERROR -ne 0 ]; then
     exit
 fi
 
+print_info "Install logstash"
 sudo apt install -y logstash >>$LOGFILE 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
     print_err "Could not install logstash (Error Code: $ERROR)."
     exit
 fi
+
+print_info "Configure logstash"
 
 sudo cp -f 02-beats-input.conf /etc/logstash/conf.d/02-beats-input.conf >>$LOGFILE 2>&1
 ERROR=$?
@@ -145,5 +164,8 @@ fi
 
 sudo -u logstash /usr/share/logstash/bin/logstash --path.settings /etc/logstash -t >>$LOGFILE 2>&1
 
+print_info "Enable logstash"
 sudo systemctl enable logstash
+
+print_info "Start logstash"
 sudo systemctl start logstash
