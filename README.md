@@ -1,1 +1,1 @@
-# elk-aws-autoscalling-cluster
+# ELK AWS Autoscalling Cluster
