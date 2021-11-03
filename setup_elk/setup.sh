@@ -54,8 +54,8 @@ sudo ufw --force enable >>$LOGFILE 2>&1
 sudo ufw status >>$LOGFILE 2>&1
 curl -4 icanhazip.com >>$LOGFILE 2>&1
 
-curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
-echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-7.x.list
+curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add - >>$LOGFILE 2>&1
+echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-7.x.list >>$LOGFILE 2>&1
 print_info "Update repository"
 sudo apt-get update >>$LOGFILE 2>&1
 ERROR=$?
