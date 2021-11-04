@@ -47,13 +47,6 @@ if [ $ERROR -ne 0 ]; then
     exit
 fi
 
-sudo ufw app list >>$LOGFILE 2>&1
-sudo ufw allow 'Nginx Full' >>$LOGFILE 2>&1
-sudo ufw allow ssh >>$LOGFILE 2>&1
-sudo ufw --force enable >>$LOGFILE 2>&1
-sudo ufw status >>$LOGFILE 2>&1
-curl -4 icanhazip.com >>$LOGFILE 2>&1
-
 curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add - >>$LOGFILE 2>&1
 echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-7.x.list >>$LOGFILE 2>&1
 print_info "Update repository"
@@ -169,6 +162,15 @@ sudo systemctl enable logstash
 
 print_info "Start logstash"
 sudo systemctl start logstash.service
+
+sudo ufw app list >>$LOGFILE 2>&1
+sudo ufw allow 'Nginx Full' >>$LOGFILE 2>&1
+sudo ufw allow ssh >>$LOGFILE 2>&1
+sudo ufw allow 5044 >>$LOGFILE 2>&1v
+sudo ufw --force enable >>$LOGFILE 2>&1
+
+sudo ufw status >>$LOGFILE 2>&1
+curl -4 icanhazip.com >>$LOGFILE 2>&1
 
 systemctl --no-pager status nginx.service >>$LOGFILE 2>&1
 systemctl --no-pager status elasticsearch.service >>$LOGFILE 2>&1
