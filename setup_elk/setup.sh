@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 print_err() {
     printf "* ERROR: $@\n" 1>&2
@@ -74,8 +74,8 @@ if [ $ERROR -ne 0 ]; then
 fi
 
 print_info "Enable elasticsearch"
-sudo systemctl daemon-reload
-sudo systemctl enable elasticsearch.service >>$LOGFILE 2>&1
+sudo systemctl --no-pager daemon-reload
+sudo systemctl --no-pager enable elasticsearch.service >>$LOGFILE 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
     print_err "Could not enable elasticsearch in systemctl (Error Code: $ERROR)."
@@ -83,7 +83,7 @@ if [ $ERROR -ne 0 ]; then
 fi
 
 print_info "Start elasticsearch"
-sudo systemctl start elasticsearch.service >>$LOGFILE 2>&1
+sudo systemctl --no-pager start elasticsearch.service >>$LOGFILE 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
     print_err "Could not start elasticsearch (Error Code: $ERROR)."
@@ -99,7 +99,7 @@ if [ $ERROR -ne 0 ]; then
 fi
 
 print_info "Enable kibana"
-sudo systemctl enable kibana >>$LOGFILE 2>&1
+sudo systemctl --no-pager enable kibana >>$LOGFILE 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
     print_err "Could not enable kibana in systemctl (Error Code: $ERROR)."
@@ -107,7 +107,7 @@ if [ $ERROR -ne 0 ]; then
 fi
 
 print_info "Start kibana"
-sudo systemctl start kibana.service >>$LOGFILE 2>&1
+sudo systemctl --no-pager start kibana.service >>$LOGFILE 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
     print_err "Could not start kibana (Error Code: $ERROR)."
@@ -124,7 +124,7 @@ fi
 
 sudo nginx -t >>$LOGFILE 2>&1
 print_info "Reload nginx"
-sudo systemctl reload nginx >>$LOGFILE 2>&1
+sudo systemctl --no-pager reload nginx >>$LOGFILE 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
     print_err "Could not reload Nginx (Error Code: $ERROR)."
@@ -158,16 +158,31 @@ fi
 sudo -u logstash /usr/share/logstash/bin/logstash --path.settings /etc/logstash -t >>$LOGFILE 2>&1
 
 print_info "Enable logstash"
-sudo systemctl enable logstash
+sudo systemctl --no-pager enable logstash >>$LOGFILE 2>&1
+ERROR=$?
+if [ $ERROR -ne 0 ]; then
+    print_err "Systemctl enable logstash service failed (Error Code: $ERROR)."
+    exit
+fi
 
 print_info "Start logstash"
-sudo systemctl start logstash.service
+sudo systemctl --no-pager start logstash.service >>$LOGFILE 2>&1
+ERROR=$?
+if [ $ERROR -ne 0 ]; then
+    print_err "Systemctl start logstash service failed (Error Code: $ERROR)."
+    exit
+fi
 
 sudo ufw app list >>$LOGFILE 2>&1
 sudo ufw allow 'Nginx Full' >>$LOGFILE 2>&1
 sudo ufw allow ssh >>$LOGFILE 2>&1
 sudo ufw allow 5044 >>$LOGFILE 2>&1v
 sudo ufw --force enable >>$LOGFILE 2>&1
+ERROR=$?
+if [ $ERROR -ne 0 ]; then
+    print_err "Firewall (ufw) setup failed (Error Code: $ERROR)."
+    exit
+fi
 
 sudo ufw status >>$LOGFILE 2>&1
 curl -4 icanhazip.com >>$LOGFILE 2>&1
