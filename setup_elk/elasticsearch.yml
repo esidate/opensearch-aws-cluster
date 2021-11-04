@@ -7,3 +7,4 @@ network.host: localhost
 # discovery.seed_hosts: ["172.31.8.211", "172.31.7.47"]
 # cluster.initial_master_nodes: ["172.31.7.47"]
 # node.master: true
+# xpack.security.enabled: true

@@ -114,6 +114,14 @@ if [ $ERROR -ne 0 ]; then
     exit
 fi
 
+print_info "Configure kibana"
+sudo cp -f kibana.yml /etc/kibana/kibana.yml >>$LOGFILE 2>&1
+ERROR=$?
+if [ $ERROR -ne 0 ]; then
+    print_err "Could not copy kibana.yml to /etc/kibana/kibana.yml (Error Code: $ERROR)."
+    exit
+fi
+
 print_info "Configure nginx"
 sudo cp -f rev-proxy.conf /etc/nginx/sites-available/default >>$LOGFILE 2>&1
 ERROR=$?
@@ -130,6 +138,9 @@ if [ $ERROR -ne 0 ]; then
     print_err "Could not reload Nginx (Error Code: $ERROR)."
     exit
 fi
+
+sudo apt install apache2-utils
+htpasswd -c /etc/nginx/conf.d/.htpasswd $NGINX_BASIC_AUTH_USER $NGINX_BASIC_AUTH_PASS
 
 print_info "Install logstash"
 sudo apt-get install -y logstash >>$LOGFILE 2>&1
@@ -176,7 +187,7 @@ fi
 sudo ufw app list >>$LOGFILE 2>&1
 sudo ufw allow 'Nginx Full' >>$LOGFILE 2>&1
 sudo ufw allow ssh >>$LOGFILE 2>&1
-sudo ufw allow 5044 >>$LOGFILE 2>&1v
+sudo ufw allow 5044 >>$LOGFILE 2>&1
 sudo ufw --force enable >>$LOGFILE 2>&1
 ERROR=$?
 if [ $ERROR -ne 0 ]; then
