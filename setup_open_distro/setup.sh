@@ -13,20 +13,8 @@ sudo ufw allow 5044
 sudo ufw --force enable
 sudo ufw status
 
-docker run -it --rm --name opensearch-logstash --net opensearch-net opensearchproject/logstash-oss-with-opensearch-output-plugin:7.13.2 \
-    -e 'input { beats { port => 5044 } } output { if [@metadata][pipeline] { opensearch { hosts => ["https://opensearch-node:9200"] manage_template => false index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}" pipeline => "%{[@metadata][pipeline]}" user => "admin" password => "admin" ssl => true ssl_certificate_verification => false } } else { opensearch { ["https://opensearch-node:9200"] manage_template => false index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}" user => "admin" password => "admin" ssl => true ssl_certificate_verification => false } } }'
-
-# Generate password
-# export ADMIN_PASS=$(plugins/opensearch-security/tools/hash.sh -p $ADMIN_PASS)
-
-# (
-#     echo "cat <<EOF >internal_users.yml"
-#     cat internal_users_template.yml
-#     echo "EOF"
-# ) >temp.yml
-# . temp.yml
-
-# rm -f temp.yml
+sudo apt-get install -y apache2-utils
+htpasswd -c -b /etc/nginx/conf.d/.htpasswd $NGINX_BASIC_AUTH_USER $NGINX_BASIC_AUTH_PASS
 
 # Generate certificates
 # Root CA
@@ -47,3 +35,15 @@ openssl x509 -req -in node.csr -CA root-ca.pem -CAkey root-ca-key.pem -CAcreates
 
 # Cleanup
 rm admin-key-temp.pem admin.csr node-key-temp.pem node.csr
+
+# Generate password
+# export ADMIN_PASS=$(plugins/opensearch-security/tools/hash.sh -p $ADMIN_PASS)
+
+# (
+#     echo "cat <<EOF >internal_users.yml"
+#     cat internal_users_template.yml
+#     echo "EOF"
+# ) >temp.yml
+# . temp.yml
+
+# rm -f temp.yml
