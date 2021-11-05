@@ -51,14 +51,6 @@ services:
     networks:
       - opensearch-net
 
-  opensearch-logstash:
-    image: opensearchproject/logstash-oss-with-opensearch-output-plugin:7.13.2
-    container_name: opensearch-logstash
-    environment:
-      - 'input { beats { port => 5044 } } output { if [@metadata][pipeline] { opensearch { hosts => ["https://opensearch-node:9200"] manage_template => false index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}" pipeline => "%{[@metadata][pipeline]}" user => "admin" password => "admin" ssl => true ssl_certificate_verification => false } } else { opensearch { ["https://opensearch-node:9200"] manage_template => false index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}" user => "admin" password => "admin" ssl => true ssl_certificate_verification => false } } }'
-    networks:
-      - opensearch-net
-
 volumes:
   opensearch-data:
 
