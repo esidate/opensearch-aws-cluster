@@ -139,8 +139,8 @@ if [ $ERROR -ne 0 ]; then
     exit
 fi
 
-sudo apt install apache2-utils
-htpasswd -c /etc/nginx/conf.d/.htpasswd $NGINX_BASIC_AUTH_USER $NGINX_BASIC_AUTH_PASS
+sudo apt-get install -y apache2-utils
+htpasswd -c -b /etc/nginx/conf.d/.htpasswd $NGINX_BASIC_AUTH_USER $NGINX_BASIC_AUTH_PASS
 
 print_info "Install logstash"
 sudo apt-get install -y logstash >>$LOGFILE 2>&1
