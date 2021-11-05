@@ -1,5 +1,8 @@
 #!/bin/bash
 
+sudo apt-get install -y apache2-utils
+htpasswd -c -b /etc/nginx/conf.d/.htpasswd $NGINX_BASIC_AUTH_USER $NGINX_BASIC_AUTH_PASS
+
 sudo apt-get install -y nginx
 sudo cp -f rev-proxy.conf /etc/nginx/sites-available/default
 sudo nginx -t
@@ -12,9 +15,6 @@ sudo ufw allow ssh
 sudo ufw allow 5044
 sudo ufw --force enable
 sudo ufw status
-
-sudo apt-get install -y apache2-utils
-htpasswd -c -b /etc/nginx/conf.d/.htpasswd $NGINX_BASIC_AUTH_USER $NGINX_BASIC_AUTH_PASS
 
 # Generate certificates
 # Root CA
