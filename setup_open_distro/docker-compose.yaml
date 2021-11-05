@@ -46,44 +46,16 @@ services:
       - "5601"
     environment:
       OPENSEARCH_HOSTS: '["https://opensearch-node:9200"]' # must be a string with no spaces when specified as an environment variable
-    volumes:
-      # - ./opensearch_dashboards.yml:/usr/share/opensearch-dashboards/config/opensearch_dashboards.yml
+    # volumes:
+    # - ./opensearch_dashboards.yml:/usr/share/opensearch-dashboards/config/opensearch_dashboards.yml
     networks:
       - opensearch-net
 
   opensearch-logstash:
     image: opensearchproject/logstash-oss-with-opensearch-output-plugin:7.13.2
     container_name: opensearch-logstash
-    environment: |
-      input {
-          beats {
-              port => 5044
-          }
-      }
-      output {
-        if [@metadata][pipeline] {
-          opensearch {
-          hosts => ["https://opensearch-node:9200"]
-          manage_template => false
-          index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}"
-          pipeline => "%{[@metadata][pipeline]}"
-          user => "admin"
-          password => "admin"
-          ssl => true
-          ssl_certificate_verification => false
-          }
-        } else {
-          opensearch {
-          ["https://opensearch-node:9200"]
-          manage_template => false
-          index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}"
-          user => "admin"
-          password => "admin"
-          ssl => true
-          ssl_certificate_verification => false
-          }
-        }
-      }
+    environment:
+      - 'input { beats { port => 5044 } } output { if [@metadata][pipeline] { opensearch { hosts => ["https://opensearch-node:9200"] manage_template => false index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}" pipeline => "%{[@metadata][pipeline]}" user => "admin" password => "admin" ssl => true ssl_certificate_verification => false } } else { opensearch { ["https://opensearch-node:9200"] manage_template => false index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}" user => "admin" password => "admin" ssl => true ssl_certificate_verification => false } } }'
     networks:
       - opensearch-net
 
