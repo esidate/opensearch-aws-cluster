@@ -1,7 +1,7 @@
 #!/bin/bash
 
-sudo apt-get install -y apache2-utils
-htpasswd -c -b /etc/nginx/conf.d/.htpasswd $NGINX_BASIC_AUTH_USER $NGINX_BASIC_AUTH_PASS
+# sudo apt-get install -y apache2-utils
+# sudo htpasswd -c -b /etc/nginx/conf.d/.htpasswd $NGINX_BASIC_AUTH_USER $NGINX_BASIC_AUTH_PASS
 
 sudo apt-get install -y nginx
 sudo cp -f rev-proxy.conf /etc/nginx/sites-available/default
@@ -36,14 +36,14 @@ openssl x509 -req -in node.csr -CA root-ca.pem -CAkey root-ca-key.pem -CAcreates
 # Cleanup
 rm admin-key-temp.pem admin.csr node-key-temp.pem node.csr
 
-# Generate password
-# export ADMIN_PASS=$(plugins/opensearch-security/tools/hash.sh -p $ADMIN_PASS)
+Generate password
+export ADMIN_PASS=$(plugins/opensearch-security/tools/hash.sh -p $ADMIN_PASS)
 
-# (
-#     echo "cat <<EOF >internal_users.yml"
-#     cat internal_users_template.yml
-#     echo "EOF"
-# ) >temp.yml
-# . temp.yml
+(
+    echo "cat <<EOF >internal_users.yml"
+    cat internal_users_template.yml
+    echo "EOF"
+) >temp.yml
+. temp.yml
 
-# rm -f temp.yml
+rm -f temp.yml
