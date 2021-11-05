@@ -37,7 +37,7 @@ openssl x509 -req -in node.csr -CA root-ca.pem -CAkey root-ca-key.pem -CAcreates
 rm admin-key-temp.pem admin.csr node-key-temp.pem node.csr
 
 Generate password
-export ADMIN_PASS=$(plugins/opensearch-security/tools/hash.sh -p $ADMIN_PASS)
+export ADMIN_PASS=$(./hash.sh -p $ADMIN_PASS)
 
 (
     echo "cat <<EOF >internal_users.yml"
