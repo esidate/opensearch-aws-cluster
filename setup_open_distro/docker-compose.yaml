@@ -26,11 +26,11 @@ services:
       - ./admin.pem:/usr/share/opensearch/config/admin.pem
       - ./admin-key.pem:/usr/share/opensearch/config/admin-key.pem
       - ./opensearch.yml:/usr/share/opensearch/config/opensearch.yml
-      - ./internal_users.yml:/usr/share/opensearch/plugins/opensearch-security/securityconfig/internal_users.yml
-      - ./roles_mapping.yml:/usr/share/opensearch/plugins/opensearch-security/securityconfig/roles_mapping.yml
-      - ./tenants.yml:/usr/share/opensearch/plugins/opensearch-security/securityconfig/tenants.yml
-      - ./roles.yml:/usr/share/opensearch/plugins/opensearch-security/securityconfig/roles.yml
-      - ./action_groups.yml:/usr/share/opensearch/plugins/opensearch-security/securityconfig/action_groups.yml
+      # - ./internal_users.yml:/usr/share/opensearch/plugins/opensearch-security/securityconfig/internal_users.yml
+      # - ./roles_mapping.yml:/usr/share/opensearch/plugins/opensearch-security/securityconfig/roles_mapping.yml
+      # - ./tenants.yml:/usr/share/opensearch/plugins/opensearch-security/securityconfig/tenants.yml
+      # - ./roles.yml:/usr/share/opensearch/plugins/opensearch-security/securityconfig/roles.yml
+      # - ./action_groups.yml:/usr/share/opensearch/plugins/opensearch-security/securityconfig/action_groups.yml
     ports:
       - 9200:9200
       - 9600:9600 # required for Performance Analyzer
@@ -47,48 +47,46 @@ services:
     environment:
       OPENSEARCH_HOSTS: '["https://opensearch-node:9200"]' # must be a string with no spaces when specified as an environment variable
     volumes:
-      - ./opensearch_dashboards.yml:/usr/share/opensearch-dashboards/config/opensearch_dashboards.yml
+      # - ./opensearch_dashboards.yml:/usr/share/opensearch-dashboards/config/opensearch_dashboards.yml
     networks:
       - opensearch-net
-  
+
   opensearch-logstash:
     image: opensearchproject/logstash-oss-with-opensearch-output-plugin:7.13.2
     container_name: opensearch-logstash
-    environment:
-      '
-input {
-    beats {
-        port => 5044
-    }
-}
-output {
-  if [@metadata][pipeline] {
-    opensearch {
-    hosts => ["https://opensearch-node:9200"]
-    manage_template => false
-    index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}"
-    pipeline => "%{[@metadata][pipeline]}"
-    user => "admin"
-    password => "admin"
-    ssl => true
-    ssl_certificate_verification => false
-    }
-  } else {
-    opensearch {
-    ["https://opensearch-node:9200"]
-    manage_template => false
-    index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}"
-    user => "admin"
-    password => "admin"
-    ssl => true
-    ssl_certificate_verification => false
-    }
-  }
-}
-      '
+    environment: |
+      input {
+          beats {
+              port => 5044
+          }
+      }
+      output {
+        if [@metadata][pipeline] {
+          opensearch {
+          hosts => ["https://opensearch-node:9200"]
+          manage_template => false
+          index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}"
+          pipeline => "%{[@metadata][pipeline]}"
+          user => "admin"
+          password => "admin"
+          ssl => true
+          ssl_certificate_verification => false
+          }
+        } else {
+          opensearch {
+          ["https://opensearch-node:9200"]
+          manage_template => false
+          index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}"
+          user => "admin"
+          password => "admin"
+          ssl => true
+          ssl_certificate_verification => false
+          }
+        }
+      }
     networks:
       - opensearch-net
-  
+
 volumes:
   opensearch-data:
 
