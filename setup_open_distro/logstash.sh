@@ -1,7 +1,7 @@
 #!/bin/bash
 
 sudo docker network create opensearch-net
-sudo docker run -it --rm --name opensearch-logstash --net opensearch-net --expose 5044 -d opensearchproject/logstash-oss-with-opensearch-output-plugin:7.13.2 \
+sudo docker run -it --rm --name opensearch-logstash --net opensearch-net -p "5044:5044" -d opensearchproject/logstash-oss-with-opensearch-output-plugin:7.13.2 \
     -e '
     input {
         beats {
