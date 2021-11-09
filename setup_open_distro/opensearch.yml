@@ -8,9 +8,9 @@ plugins.security.ssl.http.pemkey_filepath: node-key.pem
 plugins.security.ssl.http.pemtrustedcas_filepath: root-ca.pem
 plugins.security.allow_default_init_securityindex: true
 plugins.security.authcz.admin_dn:
-  - CN=A,OU=UNIT,O=ORG,L=TORONTO,ST=ONTARIO,C=CA
+  - "C=CA,ST=ONTARIO,L=TORONTO,O=ORG,OU=UNIT,CN=A"
 plugins.security.nodes_dn:
-  - "CN=A,OU=UNIT,O=ORG,L=TORONTO,ST=ONTARIO,C=CA"
+  - "C=CA,ST=ONTARIO,L=TORONTO,O=ORG,OU=UNIT,CN=A"
 plugins.security.audit.type: internal_opensearch
 plugins.security.enable_snapshot_restore_privilege: true
 plugins.security.check_snapshot_restore_write_privileges: true
