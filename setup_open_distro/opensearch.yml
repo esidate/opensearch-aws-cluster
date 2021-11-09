@@ -10,7 +10,7 @@ plugins.security.allow_default_init_securityindex: true
 plugins.security.authcz.admin_dn:
   - "C=CA,ST=ONTARIO,L=TORONTO,O=ORG,OU=UNIT,CN=A"
 plugins.security.nodes_dn:
-  - "C=CA,ST=ONTARIO,L=TORONTO,O=ORG,OU=UNIT,CN=A"
+  - "C=CA,ST=ONTARIO,L=TORONTO,O=ORG,OU=UNIT,CN=N"
 plugins.security.audit.type: internal_opensearch
 plugins.security.enable_snapshot_restore_privilege: true
 plugins.security.check_snapshot_restore_write_privileges: true
