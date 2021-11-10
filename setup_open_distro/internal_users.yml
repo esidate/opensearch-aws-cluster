@@ -12,3 +12,8 @@ admin:
   backend_roles:
     - "admin"
   description: "admin user"
+
+kibanaserver:
+  hash: "PUT_HASH_HERE"
+  reserved: true
+  description: "Demo user for the OpenSearch Dashboards server"
