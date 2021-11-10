@@ -3,13 +3,13 @@
 # sudo apt-get install -y apache2-utils
 # sudo htpasswd -c -b /etc/nginx/conf.d/.htpasswd $NGINX_BASIC_AUTH_USER $NGINX_BASIC_AUTH_PASS
 
-sudo apt-get update
-sudo apt-get install ca-certificates curl gnupg lsb-release
+sudo apt-get -y update
+sudo apt-get -y install ca-certificates curl gnupg lsb-release
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
-sudo apt-get update
-sudo apt-get install docker-ce docker-ce-cli containerd.io
+sudo apt-get -y update
+sudo apt-get -y install docker-ce docker-ce-cli containerd.io
 
 sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
@@ -18,7 +18,7 @@ sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 sudo sh -c 'echo "vm.max_map_count=262144" >>/etc/sysctl.conf'
 sudo sysctl -p
 
-sudo apt-get install -y nginx
+sudo apt-get -y install -y nginx
 sudo cp -f rev-proxy.conf /etc/nginx/sites-available/default
 sudo nginx -t
 sudo systemctl --no-pager reload nginx
