@@ -49,7 +49,7 @@ openssl req -new -key node-key.pem -out node.csr -subj "/CN=N/OU=UNIT/O=ORG/L=TO
 openssl x509 -req -in node.csr -CA root-ca.pem -CAkey root-ca-key.pem -CAcreateserial -sha256 -out node.pem
 
 # Cleanup
-rm admin-key-temp.pem admin.csr node-key-temp.pem node.csr
+rm admin-key-temp.pem admin.csr node-key-temp.pem node.csr root-ca.srl
 
 sudo docker network create opensearch-net
 sudo docker run -it --rm --name opensearch-logstash --net opensearch-net -p "5044:5044" -d opensearchproject/logstash-oss-with-opensearch-output-plugin:7.13.2 \
