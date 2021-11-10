@@ -3,6 +3,9 @@
 # sudo apt-get install -y apache2-utils
 # sudo htpasswd -c -b /etc/nginx/conf.d/.htpasswd $NGINX_BASIC_AUTH_USER $NGINX_BASIC_AUTH_PASS
 
+sudo sh -c 'echo "vm.max_map_count=262144" >>/etc/sysctl.conf'
+sudo sysctl -p
+
 sudo apt-get install -y nginx
 sudo cp -f rev-proxy.conf /etc/nginx/sites-available/default
 sudo nginx -t
@@ -36,14 +39,50 @@ openssl x509 -req -in node.csr -CA root-ca.pem -CAkey root-ca-key.pem -CAcreates
 # Cleanup
 rm admin-key-temp.pem admin.csr node-key-temp.pem node.csr
 
-Generate password
-export ADMIN_PASS=$(echo "slakdjsakdjsaldjsalkd")
+sudo docker network create opensearch-net
+sudo docker run -it --rm --name opensearch-logstash --net opensearch-net -p "5044:5044" -d opensearchproject/logstash-oss-with-opensearch-output-plugin:7.13.2 \
+    -e '
+    input {
+        beats {
+            port => 5044
+            }
+        }
+    output {
+        if [@metadata][pipeline] {
+            opensearch {
+                hosts => ["https://opensearch-node:9200"]
+                manage_template => false
+                index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}"
+                pipeline => "%{[@metadata][pipeline]}"
+                user => "admin"
+                password => "admin"
+                ssl => true
+                ssl_certificate_verification => false
+            }
+        } else {
+            opensearch {
+                hosts => ["https://opensearch-node:9200"]
+                manage_template => false
+                index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}"
+                user => "admin"
+                password => "admin"
+                ssl => true
+                ssl_certificate_verification => false
+            }
+        }
+    }
+    '
 
-(
-    echo "cat <<EOF >internal_users.yml"
-    cat internal_users_template.yml
-    echo "EOF"
-) >temp.yml
-. temp.yml
+sudo docker-compose up -d
+sudo docker-compose logs -f
+# Generate password
+# export ADMIN_PASS=$(echo "slakdjsakdjsaldjsalkd")
 
-rm -f temp.yml
+# (
+#     echo "cat <<EOF >internal_users.yml"
+#     cat internal_users_template.yml
+#     echo "EOF"
+# ) >temp.yml
+# . temp.yml
+
+# rm -f temp.yml
